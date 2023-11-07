@@ -1,5 +1,5 @@
 # Libraries
-packages <- c("ggplot2", "dplyr", "tidyr", "lubridate", "purrr", "yahoofinancer")
+packages <- c("ggplot2","scales","dplyr", "tidyr", "lubridate", "purrr", "yahoofinancer")
 for(p in packages){
   if(!require(p,character.only = TRUE)) install.packages(p)
   library(p,character.only = TRUE)
