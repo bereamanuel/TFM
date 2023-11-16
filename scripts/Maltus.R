@@ -1,4 +1,4 @@
-maltus_simulation <- function(x0,t0,r,alpha,t,ro, times){
+maltus_simulation <- function(x0,t0,r,alpha,t,N, times){
   ## Maltus simulation  
   ## ------------------
   ## x0     : Initial value
@@ -6,7 +6,7 @@ maltus_simulation <- function(x0,t0,r,alpha,t,ro, times){
   ## r      : Constant
   ## alpha  : Constant
   ## t      : Final time
-  ## r0     : Step time
+  ## N      : Number points grid
   ## times  : Num simulations
   ## 
   ## --------------------
@@ -18,6 +18,7 @@ maltus_simulation <- function(x0,t0,r,alpha,t,ro, times){
   ##
   
     mu <- r-alpha^2/2
+    ro <- (t-t0)/N
     ts <- seq(t0,t,ro)
     
     xs <- rep(0,t)
@@ -29,7 +30,7 @@ maltus_simulation <- function(x0,t0,r,alpha,t,ro, times){
     for (time in 1:times){
       
       for (i in 1:length(ts)){
-        xs[i] <- x0*exp(mu*ts[i] + alpha*rnorm(1,0,ts[i]))
+        xs[i] <- x0*exp(mu*ts[i] + alpha*rnorm(1,0,ts[i] ) )
         es[i] <- x0*exp(mu*ts[i])
         sd[i] <- sqrt( (x0^2)*exp(2*mu*ts[i])*(exp((alpha^2)*ts[i])-1) )
       }
@@ -51,27 +52,4 @@ maltus_simulation <- function(x0,t0,r,alpha,t,ro, times){
     
     maltus
 }
-
-times <- 20
-
-maltus1_t20 <- maltus_simulation(x0 = 50,t0 = 0,r = 0.245,alpha = 0.3,t = 20,ro = 0.2, times = times)
-maltus2_t20 <- maltus_simulation(x0 = 50,t0 = 0,r = 0.045,alpha = 0.3,t = 20,ro = 0.2, times = times)
-maltus3_t20 <- maltus_simulation(x0 = 50,t0 = 0,r = -0.155,alpha = 0.3,t = 20,ro = 0.2, times = times)
-   
-maltus_t20 <- bind_rows(maltus1_t20,
-                        maltus2_t20,
-                        maltus3_t20)             
-
-p <- 
-  maltus_t20 %>% 
-  filter(Type == "Et") %>% View()
-      ggplot(aes(x = ts, group = Type))+
-      geom_ribbon(aes(ymin = log((xs+sd +1), ymax = ifelse(is.na(log((xs-sd))),0,log((xs-sd)+1))), fill = "grey70", alpha = 0.2) +
-      geom_line(aes(y = log(xs+1))) + 
-      facet_wrap(~variables)+
-      ylab("Log Et")+
-      xlab("t")+
-      ggtitle("Simulación del modelo de Maltus")
-
-savePlot(p,"Modelo_Maltus_t50.jpeg")
 
