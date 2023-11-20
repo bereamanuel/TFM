@@ -30,7 +30,7 @@ maltus_simulation <- function(x0,t0,r,alpha,t,N, times){
     for (time in 1:times){
       
       for (i in 1:length(ts)){
-        xs[i] <- x0*exp(mu*ts[i] + alpha*rnorm(1,0,ts[i] ) )
+        xs[i] <- x0*exp(mu*ts[i] + alpha*rnorm(1,0,ts[i]) )
         es[i] <- x0*exp(mu*ts[i])
         sd[i] <- sqrt( (x0^2)*exp(2*mu*ts[i])*(exp((alpha^2)*ts[i])-1) )
       }
