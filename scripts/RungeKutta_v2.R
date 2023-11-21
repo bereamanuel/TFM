@@ -44,14 +44,22 @@ rk4_simulation <- function(x0,t0,tn,N,MU,SIGMA,times){
     
     # for loop
     for (i in seq(2,N+1)){
-      
       dwt <- rnorm(1,0,sqrt(dt))
-      st <- ifelse( rbinom(1,1,1/2) == 0, -1, 1)
       
-      k1 <- MU(ys[i-1],ts[i-1])*dt + SIGMA(ys[i-1],ts[i-1])*(dwt - st*sqrt(dt))
-      k2 <- MU(ys[i-1] + k1, ts[i-1]+dt)+ SIGMA(ys[i-1]+k1,ts[i-1]+dt)*(dwt + st*sqrt(dt))
+      F1 <- MU(ys[i-1],ts[i-1])
+      G1 <- SIGMA(ys[i-1],ts[i-1])
       
-      ys[i] <- ys[i-1] + (k1 + k2)/2
+      F2 <- MU(ys[i-1] + (1/2)*F1*dt + (1/2)*G1*dwt, ts[i-1]+dt/2)
+      G2 <- SIGMA(ys[i-1] + (1/2)*F1*dt + (1/2)*G1*dwt, ts[i-1]+dt/2)
+      
+      F3 <- MU(ys[i-1] + (1/2)*F2*dt + (1/2)*G2*dwt, ts[i-1]+dt/2)
+      G3 <- SIGMA(ys[i-1] + (1/2)*F2*dt + (1/2)*G2*dwt, ts[i-1]+dt/2)
+      
+      F4 <- MU(ys[i-1] + F3*dt + (1/2)*G3*dwt, ts[i])
+      G4 <- SIGMA(ys[i-1] + F3*dt + (1/2)*G3*dwt, ts[i])
+      
+      #Sol
+      ys[i] <- ys[i-1] + (1/6)*((F1+2*F2+2*F3+F4)*dt + (G1+2*G2+2*G3+G4)*dwt)
       
     }
     
