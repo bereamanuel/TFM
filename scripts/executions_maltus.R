@@ -29,7 +29,21 @@ p <-
 
 p
 
-savePlot(p,"Modelo_Maltus_t1.jpeg")
+p2 <- maltus3_t20 %>% filter(Type != "Et") %>% filter(Iter == 1) %>% 
+  ggplot(aes(x = ts))+
+  geom_line( aes(y = xs, color = "Observada")) +
+  geom_line(data = maltus_t20 %>% filter(Type == "Et") %>% filter(Iter == 1) %>% filter(variables == "X0 = 5e+05, r = -0.155, alpha = 0.3"), aes(y = xs, color = "Teórica")) +
+  facet_wrap(~variables)+
+  ylab("Xt")+
+  xlab("t")+
+  scale_colour_manual("Method", 
+                      breaks = c("Observada", "Teórica"),
+                      values = c("Observada"="black", 
+                                 "Teórica"="red"))+
+  ggtitle("Modelo de Maltus")
+  
+
+savePlot(p2,"Modelo_Maltus_1iter.jpeg")
 
 ## E-M Execution ------------------
 M_MU <- function(x,t){
@@ -198,17 +212,7 @@ maltus <- bind_rows(
     group_by(ts) %>% 
     summarise(es = mean(ys),
               std = sd(ys),
-              type = "Milstein"),
-  rk %>% 
-    group_by(ts) %>% 
-    summarise(es = mean(ys),
-              std = sd(ys),
-              type = "RK2"),
-  rk4 %>% 
-    group_by(ts) %>% 
-    summarise(es = mean(ys),
-              std = sd(ys),
-              type = "RK4")
+              type = "Milstein")
 )
 
 comp <- maltus %>% 
@@ -223,12 +227,53 @@ comp <- maltus %>%
                                 breaks = c("Euler","Milstein","RK2","RK4", "Teórica"),
                                 values = c("Euler"="red", 
                                            "Milstein"="blue",
-                                           "RK2" = "green",
-                                           "RK4" = "purple",
                                            "Teórica"="black"))+
             ggtitle("Modelo de Maltus")
 
-comp
-
+gt_two_column_layout( list(
+  gt(maltus %>% filter(type  == "Euler") %>% select(ts, euler = es) %>%
+  inner_join(maltus %>% filter(type  == "Milstein") %>% select(ts, milstein = es) , by = "ts") %>% 
+  inner_join(maltus3_t20 %>% filter(Type == "Et") %>% filter(Iter == 1) %>% select(ts, et = xs) , by = "ts") %>% 
+  mutate(error_euler = et-euler,
+         error_1_euler = abs(error_euler),
+         error_2_euler = error_euler^2,
+         error_milst = et-milstein,
+         error_1_milst = abs(error_milst),
+         error_2_milst = error_milst^2) %>% 
+  summarise(RMAE_Euler = round(sqrt(sum(error_1_euler)/(N+1)),2),
+            RMAE_Milst = round(sqrt(sum(error_1_milst)/(N+1)),2),
+            RMSE_Euler = round(sqrt(sum(error_2_euler)/(N+1)),2),
+            RMSE_Milst = round(sqrt(sum(error_2_milst)/(N+1)),2)) %>% 
+  gather(key = "Medida", value = "Error") %>% 
+  mutate(Method = str_sub(Medida,start = -5),
+         Medida = str_sub(Medida,start = 1,end = 4)) %>% 
+    filter(Medida == "RMAE") %>% 
+    select(Method,Error) )%>% 
+  tab_header(
+    title = "RMAE",
+  )  ,
+  gt(maltus %>% filter(type  == "Euler") %>% select(ts, euler = es) %>%
+       inner_join(maltus %>% filter(type  == "Milstein") %>% select(ts, milstein = es) , by = "ts") %>% 
+       inner_join(maltus3_t20 %>% filter(Type == "Et") %>% filter(Iter == 1) %>% select(ts, et = xs) , by = "ts") %>% 
+       mutate(error_euler = et-euler,
+              error_1_euler = abs(error_euler),
+              error_2_euler = error_euler^2,
+              error_milst = et-milstein,
+              error_1_milst = abs(error_milst),
+              error_2_milst = error_milst^2) %>% 
+       summarise(RMAE_Euler = round(sqrt(sum(error_1_euler)/(N+1)),2),
+                 RMAE_Milst = round(sqrt(sum(error_1_milst)/(N+1)),2),
+                 RMSE_Euler = round(sqrt(sum(error_2_euler)/(N+1)),2),
+                 RMSE_Milst = round(sqrt(sum(error_2_milst)/(N+1)),2)) %>% 
+       gather(key = "Medida", value = "Error") %>% 
+       mutate(Method = str_sub(Medida,start = -5),
+              Medida = str_sub(Medida,start = 1,end = 4)) %>% 
+       filter(Medida == "RMSE") %>% 
+       select(Method,Error) )%>% 
+    tab_header(
+      title = "RMSE",
+    ) 
+  )
+)
 
 savePlot(comp,"comparision_maltus.jpeg")
