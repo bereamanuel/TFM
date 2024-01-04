@@ -1,2 +1,3 @@
 # TFM
 My TFM project about Numerical Methods for Stchocastic Differential Equations
+This work addresses the fundamental theoretical foundations for implementing numerical methods applied to stochastic differential equations. It encompasses essential definitions of stochastic processes and conducts an in-depth examination of the Taylor--Itô theorem, employed as a tool for developing algorithms necessary for the numerical resolution of the posed problem. The scrutinized algorithms represent extensions of basic models of non-stochastic differential equations adapted to the stochastic domain. Lastly, a practical case is considered, applied to benchmark stock indices.
