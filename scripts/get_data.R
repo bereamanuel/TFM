@@ -25,7 +25,7 @@ acc_apple <- df %>%
                                   breaks = c("Valor cierre", "Tendencia"),
                                   values = c("Valor cierre"="black", 
                                              "Tendencia"="red"))+
-              ggtitle("Últimos 5 años de acción de Apple")
+              ggtitle("Cotización últimos 5 años de acción de Apple")
 
 
 

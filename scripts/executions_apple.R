@@ -58,7 +58,7 @@ plot10<- m %>%
                                  "E-M"="red",
                                  "Milstein" = "blue",
                                  "Modelo Log-Normal" = "purple"))+
-  ggtitle("Cierre L5Y Apple Inc.")
+  ggtitle("Cotización al cierre L5Y Apple Inc.")
 
 savePlot(plot10,"comp_L5Y.jpeg")
 
