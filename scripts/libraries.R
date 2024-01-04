@@ -1,5 +1,9 @@
 # Libraries
-packages <- c("ggplot2","scales","dplyr", "tidyr", "lubridate", "purrr", "yahoofinancer","gt","gtExtras","stringr","gridExtra")
+packages <- c("ggplot2","tidyquant","scales",
+              "dplyr", "tidyr", "lubridate", 
+              "purrr", "yahoofinancer","gt",
+              "gtExtras","stringr","gridExtra",
+              "TTR","graphics","seasonal","knitr")
 for(p in packages){
   if(!require(p,character.only = TRUE)) install.packages(p)
   library(p,character.only = TRUE)
